@@ -11,26 +11,26 @@ from sklearn.cluster import DBSCAN
 from sklearn.preprocessing import StandardScaler
 from datetime import datetime
 
-# Initialize pygame
+
 pygame.init()
 pygame.font.init()
 
-# Screen dimensions
+
 WIDTH, HEIGHT = 1600, 900
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
 pygame.display.set_caption("Ultra-Advanced AI-Powered Indoor Obstacle Avoidance System")
 
-# Colors
+
 BACKGROUND = (240, 240, 245)
 GRID_COLOR = (220, 220, 230)
 WALL_COLOR = (50, 50, 70)
 AGENT_COLORS = [
-    (41, 128, 185),  # Blue
-    (231, 76, 60),   # Red
-    (46, 204, 113),  # Green
-    (155, 89, 182),  # Purple
-    (241, 196, 15),  # Yellow
-    (230, 126, 34)   # Orange
+    (41, 128, 185), 
+    (231, 76, 60),   
+    (46, 204, 113),  
+    (155, 89, 182),  
+    (241, 196, 15),  
+    (230, 126, 34)   
 ]
 AGENT_OUTLINE = (30, 30, 30)
 PATH_COLORS = [
@@ -58,14 +58,14 @@ WARNING_COLOR = (241, 196, 15)
 ERROR_COLOR = (231, 76, 60)
 NEUTRAL_COLOR = (149, 165, 166)
 
-# Fonts
+
 font = pygame.font.SysFont('Arial', 16)
 title_font = pygame.font.SysFont('Arial', 28, bold=True)
 small_font = pygame.font.SysFont('Arial', 14)
 large_font = pygame.font.SysFont('Arial', 36, bold=True)
 console_font = pygame.font.SysFont('Courier New', 14)
 
-# Environment templates
+
 ENVIRONMENT_TEMPLATES = {
     "Office": {
         "walls": [
@@ -147,7 +147,7 @@ class IndoorEnvironment:
         return [{"pos": pos, "in_use": False} for pos in stations]
     
     def generate_obstacles(self):
-        # Generate random static obstacles
+       
         for _ in range(12):
             x = random.randint(120, 1160)
             y = random.randint(120, 760)
@@ -158,14 +158,13 @@ class IndoorEnvironment:
                 'color': OBSTACLE_COLOR
             })
             
-        # Add some dynamic obstacles that will move
         for _ in range(6):
             x = random.randint(120, 1160)
             y = random.randint(120, 760)
             size = random.randint(25, 40)
             speed = random.uniform(0.5, 2.0)
             direction = [random.uniform(-1, 1), random.uniform(-1, 1)]
-            # Normalize direction
+           
             norm = math.sqrt(direction[0]**2 + direction[1]**2)
             direction[0] /= norm
             direction[1] /= norm
@@ -178,7 +177,7 @@ class IndoorEnvironment:
             })
     
     def generate_furniture(self):
-        # Add some furniture-like obstacles based on environment type
+       
         if self.env_type == "Office":
             furniture = [
                 (150, 150, 80, 120), (250, 550, 100, 100), (450, 550, 120, 80),
@@ -217,24 +216,24 @@ class IndoorEnvironment:
                 direction = obstacle['direction']
                 speed = obstacle['speed']
                 
-                # Move the obstacle
+               
                 rect.x += direction[0] * speed
                 rect.y += direction[1] * speed
                 
-                # Bounce off walls
+                
                 if rect.left < 120 or rect.right > 1180:
                     direction[0] *= -1
                 if rect.top < 120 or rect.bottom > 780:
                     direction[1] *= -1
                     
-                # Occasionally change direction randomly
+               
                 if random.random() < 0.01:
                     new_direction = [random.uniform(-1, 1), random.uniform(-1, 1)]
                     norm = math.sqrt(new_direction[0]**2 + new_direction[1]**2)
                     obstacle['direction'] = [new_direction[0]/norm, new_direction[1]/norm]
     
     def update_heatmap(self, x, y):
-        # Update heatmap with agent position
+        
         grid_x, grid_y = min(int(x / 10), self.heatmap.shape[0]-1), min(int(y / 10), self.heatmap.shape[1]-1)
         self.heatmap[grid_x, grid_y] += 1
     
@@ -242,29 +241,29 @@ class IndoorEnvironment:
         self.mission_time = time.time() - self.start_time
     
     def draw(self, screen):
-        # Draw background grid
+       
         for x in range(100, 1200, 50):
             pygame.draw.line(screen, GRID_COLOR, (x, 100), (x, 780), 1)
         for y in range(100, 800, 50):
             pygame.draw.line(screen, GRID_COLOR, (100, y), (1180, y), 1)
         
-        # Draw walls
+        
         for wall in self.walls:
             pygame.draw.rect(screen, WALL_COLOR, wall)
         
-        # Draw doorways
+        
         for doorway in self.doorways:
             pygame.draw.rect(screen, BACKGROUND, doorway)
             pygame.draw.rect(screen, WALL_COLOR, doorway, 2)
         
-        # Draw obstacles
+      
         for obstacle in self.obstacles:
             pygame.draw.rect(screen, obstacle['color'], obstacle['rect'])
             if obstacle['type'] == 'furniture':
-                # Add some detail to furniture
+                
                 pygame.draw.rect(screen, (80, 70, 60), obstacle['rect'], 2)
         
-        # Draw charging stations
+        
         for station in self.charging_stations:
             color = (46, 204, 113) if not station['in_use'] else (241, 196, 15)
             pygame.draw.circle(screen, color, station['pos'], 15)
@@ -272,7 +271,7 @@ class IndoorEnvironment:
             pygame.draw.circle(screen, (30, 30, 30), station['pos'], 8, 1)
     
     def draw_heatmap(self, screen):
-        # Draw heatmap of agent positions
+        
         max_val = np.max(self.heatmap) if np.max(self.heatmap) > 0 else 1
         for x in range(self.heatmap.shape[0]):
             for y in range(self.heatmap.shape[1]):
@@ -288,7 +287,7 @@ class Agent:
         self.radius = 15
         self.speed = 3.0
         self.max_speed = 5.0
-        self.direction = 0  # Angle in radians
+        self.direction = 0  s
         self.sensors = []
         self.path = []
         self.current_target = 0
@@ -300,7 +299,7 @@ class Agent:
         self.path_color = path_color
         self.type = agent_type
         self.target_x, self.target_y = x, y
-        self.memory = []  # For storing previously visited locations
+        self.memory = []  
         self.memory_size = 100
         self.completed_paths = 0
         self.total_distance = 0
@@ -327,11 +326,11 @@ class Agent:
         
     def generate_skill_set(self):
         skills = ["navigation", "data_collection", "mapping", "obstacle_avoidance"]
-        # Each agent has different skill levels
+       
         return {skill: random.uniform(0.5, 1.0) for skill in skills}
     
     def initialize_ai_model(self):
-        # Simulate a simple AI model that improves over time
+       
         return {
             "obstacle_prediction_accuracy": 0.7,
             "path_optimization": 0.6,
@@ -340,7 +339,7 @@ class Agent:
         }
     
     def improve_ai_model(self, success):
-        # Improve AI model based on experience
+        
         improvement = self.ai_model["learning_rate"] * (1 if success else -0.5)
         self.ai_model["obstacle_prediction_accuracy"] = max(0.5, min(0.95, self.ai_model["obstacle_prediction_accuracy"] + improvement))
         self.ai_model["path_optimization"] = max(0.5, min(0.95, self.ai_model["path_optimization"] + improvement))
@@ -371,7 +370,7 @@ class Agent:
             closest_collision = None
             min_dist = self.max_sensor_range
 
-            # Check collision with walls
+            
             for wall in environment.walls:
                 collision = self.line_rect_intersection(self.x, self.y, end_x, end_y, pygame.Rect(wall))
                 if collision:
@@ -380,7 +379,7 @@ class Agent:
                         min_dist = dist
                         closest_collision = collision
             
-            # Check collision with obstacles
+            
             for obstacle in environment.obstacles:
                 collision = self.line_rect_intersection(self.x, self.y, end_x, end_y, obstacle['rect'])
                 if collision:
@@ -395,29 +394,29 @@ class Agent:
             else:
                 self.sensors.append((self.x, self.y, end_x, end_y))
         
-        # Cluster detection points for obstacle avoidance
+       
         if self.collision_points:
             points = np.array(self.collision_points)
             if len(points) > 1:
-                # Normalize points for clustering
+                
                 scaler = StandardScaler()
                 points_scaled = scaler.fit_transform(points)
                 
-                # Use DBSCAN to cluster obstacles
+                
                 clustering = DBSCAN(eps=0.6, min_samples=2).fit(points_scaled)
                 self.clusters = []
                 for label in set(clustering.labels_):
-                    if label != -1:  # Ignore noise
+                    if label != -1:  
                         cluster_points = points[clustering.labels_ == label]
                         self.clusters.append(cluster_points)
     
     def line_rect_intersection(self, x1, y1, x2, y2, rect):
-        # Check if line intersects with rectangle
+        
         lines = [
-            (rect.left, rect.top, rect.right, rect.top),     # top
-            (rect.right, rect.top, rect.right, rect.bottom), # right
-            (rect.right, rect.bottom, rect.left, rect.bottom), # bottom
-            (rect.left, rect.bottom, rect.left, rect.top)    # left
+            (rect.left, rect.top, rect.right, rect.top),     
+            (rect.right, rect.top, rect.right, rect.bottom), 
+            (rect.right, rect.bottom, rect.left, rect.bottom), 
+            (rect.left, rect.bottom, rect.left, rect.top)  
         ]
         
         intersections = []
@@ -429,7 +428,7 @@ class Agent:
         if not intersections:
             return None
             
-        # Find the closest intersection
+        
         closest = None
         min_dist = float('inf')
         for intersection in intersections:
@@ -441,7 +440,7 @@ class Agent:
         return closest
     
     def line_line_intersection(self, x1, y1, x2, y2, x3, y3, x4, y4):
-        # Calculate intersection of two lines
+       
         den = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1)
         if den == 0:
             return None
@@ -460,21 +459,21 @@ class Agent:
         return (x, y)
     
     def plan_path(self, target_x, target_y, environment):
-        # Path planning with obstacle avoidance
+       
         self.path = []
         
-        # Add current position as first point
+        
         self.path.append((self.x, self.y))
         self.target_x, self.target_y = target_x, target_y
         
-        # If there's a clear path to target, go directly
+       
         if not self.check_collision(self.x, self.y, target_x, target_y, environment):
             self.path.append((target_x, target_y))
             self.current_target = 1
             self.status = "Navigating"
             return
         
-        # Otherwise, find a path around obstacles using waypoints
+       
         waypoints = self.find_waypoints(target_x, target_y, environment)
         self.path.extend(waypoints)
         self.path.append((target_x, target_y))
@@ -482,16 +481,16 @@ class Agent:
         self.status = "Navigating"
     
     def find_waypoints(self, target_x, target_y, environment):
-        # Find safe waypoints around obstacles using AI-improved pathfinding
+        
         waypoints = []
         mid_x, mid_y = (self.x + target_x) / 2, (self.y + target_y) / 2
         
-        # Use AI model to determine the number of waypoints to try
+       
         num_waypoints = int(20 * self.ai_model["path_optimization"])
         
-        # Try to find safe intermediate points
+        
         for angle in np.linspace(0, 2*math.pi, num_waypoints):
-            # Adjust search radius based on AI model
+            
             search_radius = 150 * self.ai_model["obstacle_prediction_accuracy"]
             test_x = mid_x + math.cos(angle) * search_radius
             test_y = mid_y + math.sin(angle) * search_radius
@@ -501,22 +500,22 @@ class Agent:
                 not self.check_collision(test_x, test_y, target_x, target_y, environment)):
                 
                 waypoints.append((test_x, test_y))
-                # Improve AI model based on successful path finding
+               
                 self.improve_ai_model(True)
                 break
         
         return waypoints
     
     def check_collision(self, x1, y1, x2, y2, environment):
-        # Check if path between two points collides with any obstacle
+        
         for obstacle in environment.obstacles:
             if self.line_rect_intersection(x1, y1, x2, y2, obstacle['rect']):
                 return True
         
-        # Check walls (but not doorways)
+       
         for wall in environment.walls:
             if self.line_rect_intersection(x1, y1, x2, y2, pygame.Rect(wall)):
-                # Check if this is actually a doorway
+                
                 is_doorway = False
                 for doorway in environment.doorways:
                     if (wall[0] == doorway[0] and wall[1] == doorway[1] and 
@@ -539,29 +538,29 @@ class Agent:
         dy = target_y - self.y
         distance = math.sqrt(dx**2 + dy**2)
         
-        if distance < 10:  # Reached target
+        if distance < 10: 
             self.current_target += 1
             if self.current_target >= len(self.path):
                 self.completed_paths += 1
                 self.status = "Idle"
-                # Collect data at target
+                
                 self.data_collected += random.randint(1, 5) * self.skill_set["data_collection"]
             return
             
-        # Normalize direction
+        
         if distance > 0:
             dx /= distance
             dy /= distance
             
-        # Update direction
+        
         self.direction = math.atan2(dy, dx)
         
-        # Move toward target with speed adjusted by AI model
+        
         ai_adjusted_speed = self.speed * self.ai_model["path_optimization"]
         self.x += dx * ai_adjusted_speed
         self.y += dy * ai_adjusted_speed
         
-        # Update battery with AI-optimized drain rate
+        
         battery_drain = self.battery_drain_rate * (2 - self.ai_model["battery_management"])
         self.battery -= battery_drain
         if self.battery < 15:
@@ -570,19 +569,19 @@ class Agent:
             self.battery = 0
             self.status = "Battery Dead"
         
-        # Update distance traveled
+        
         dist_moved = math.sqrt((self.x - self.last_position[0])**2 + 
                                (self.y - self.last_position[1])**2)
         self.total_distance += dist_moved
         self.last_position = (self.x, self.y)
         
-        # Add to memory
+       
         self.memory.append((self.x, self.y))
         if len(self.memory) > self.memory_size:
             self.memory.pop(0)
     
     def charge_battery(self, environment):
-        # Check if at a charging station
+        
         for station in environment.charging_stations:
             dist = math.sqrt((self.x - station['pos'][0])**2 + (self.y - station['pos'][1])**2)
             if dist < 25 and not station['in_use']:
@@ -601,7 +600,7 @@ class Agent:
         if not self.collision_points:
             return
             
-        # Calculate repulsion force from obstacles with AI-predicted avoidance
+        
         repulsion_x, repulsion_y = 0, 0
         
         for point in self.collision_points:
@@ -609,44 +608,44 @@ class Agent:
             dy = self.y - point[1]
             distance = math.sqrt(dx**2 + dy**2)
             
-            if distance < 1:  # Avoid division by zero
+            if distance < 1:  
                 distance = 1
                 
-            # Strength of repulsion is inverse to distance squared, adjusted by AI
+           
             strength = 1.0 / (distance * distance) * self.ai_model["obstacle_prediction_accuracy"]
             repulsion_x += dx * strength
             repulsion_y += dy * strength
             
-        # Normalize repulsion vector
+        
         repulsion_mag = math.sqrt(repulsion_x**2 + repulsion_y**2)
         if repulsion_mag > 0:
             repulsion_x /= repulsion_mag
             repulsion_y /= repulsion_mag
             
-            # Adjust direction based on repulsion
+            
             self.direction = math.atan2(repulsion_y, repulsion_x)
             
-            # Move away from obstacles
+           
             avoidance_strength = 0.5 * self.ai_model["obstacle_prediction_accuracy"]
             self.x += repulsion_x * self.speed * avoidance_strength
             self.y += repulsion_y * self.speed * avoidance_strength
     
     def basic_navigation(self, environment):
-        # Basic navigation: just follow the path
+        
         self.move_toward_target()
     
     def advanced_navigation(self, environment):
-        # Advanced navigation: follow path with obstacle avoidance
+        
         self.move_toward_target()
         self.avoid_obstacles(environment)
     
     def smart_navigation(self, environment):
-        # Smart navigation: adaptive path following with obstacle prediction
+       
         self.move_toward_target()
         
-        # Predict obstacle movement and adjust
+       
         if self.collision_points and len(self.path) > self.current_target:
-            # Check if we need to replan path due to moving obstacles
+           
             target_x, target_y = self.path[self.current_target]
             if self.check_collision(self.x, self.y, target_x, target_y, environment):
                 self.plan_path(self.target_x, self.target_y, environment)
@@ -654,16 +653,16 @@ class Agent:
         self.avoid_obstacles(environment)
     
     def adaptive_navigation(self, environment):
-        # Adaptive navigation: machine learning-inspired approach
+       
         self.move_toward_target()
         
-        # Use cluster information for better obstacle avoidance
+        
         if self.clusters:
-            # Calculate center of mass of obstacles
+          
             cluster_points = np.vstack(self.clusters)
             center_x, center_y = np.mean(cluster_points, axis=0)
             
-            # Move away from obstacle clusters
+           
             dx = self.x - center_x
             dy = self.y - center_y
             distance = math.sqrt(dx**2 + dy**2)
@@ -672,16 +671,16 @@ class Agent:
                 dx /= distance
                 dy /= distance
                 
-                # Adjust path based on cluster position
+               
                 self.x += dx * self.speed * 0.3
                 self.y += dy * self.speed * 0.3
         
         self.avoid_obstacles(environment)
     
     def ml_optimized_navigation(self, environment):
-        # ML-optimized navigation with continuous learning
+        
         if self.emergency_mode and not self.charging:
-            # Find nearest charging station
+           
             nearest_station = None
             min_dist = float('inf')
             for station in environment.charging_stations:
@@ -696,30 +695,30 @@ class Agent:
         
         self.move_toward_target()
         
-        # Use AI model for improved obstacle avoidance
+       
         if self.collision_points and len(self.path) > self.current_target:
-            # Use AI to predict if we need to replan
+          
             replan_probability = 1.0 - self.ai_model["obstacle_prediction_accuracy"]
             if random.random() < replan_probability:
                 self.plan_path(self.target_x, self.target_y, environment)
         
         self.avoid_obstacles(environment)
         
-        # Try to charge if battery is low
+      
         if self.battery < 30 and not self.charging:
             self.charge_battery(environment)
     
     def swarm_intelligence_navigation(self, environment, agents):
-        # Swarm intelligence approach that coordinates with other agents
+       
         self.move_toward_target()
         
-        # Share information with other agents
+       
         self.update_communication(agents)
         
-        # If other agents have found better paths, consider using them
+        
         for partner in self.communication_partners:
             if partner.path and len(partner.path) > 1:
-                # Check if partner's path is better
+                
                 partner_path_length = sum(math.sqrt((partner.path[i][0]-partner.path[i-1][0])**2 + 
                                           (partner.path[i][1]-partner.path[i-1][1])**2) 
                                  for i in range(1, len(partner.path)))
@@ -728,8 +727,8 @@ class Agent:
                                        (self.path[i][1]-self.path[i-1][1])**2) 
                               for i in range(1, len(self.path))) if self.path else float('inf')
                 
-                if partner_path_length < our_path_length * 0.8:  # Partner's path is at least 20% better
-                    # Adopt part of partner's path
+                if partner_path_length < our_path_length * 0.8: 
+                   
                     self.path = partner.path.copy()
                     self.current_target = min(self.current_target, len(self.path)-1)
                     break
@@ -737,22 +736,21 @@ class Agent:
         self.avoid_obstacles(environment)
     
     def update_communication(self, agents):
-        # Find agents within communication range
+        
         self.communication_partners = []
         for agent in agents:
             if agent != self:
                 dist = math.sqrt((self.x - agent.x)**2 + (self.y - agent.y)**2)
                 if dist < self.communication_range:
                     self.communication_partners.append(agent)
-                    # Share data with nearby agents
-                    if random.random() < 0.1:  # Occasional data transfer
+                    
                         transfer_amount = random.randint(1, 3)
                         if agent.data_collected >= transfer_amount:
                             agent.data_collected -= transfer_amount
                             self.data_collected += transfer_amount
-                    # Share AI model improvements
+                    
                     if random.random() < 0.05:
-                        # Learn from partner's AI model
+                       
                         for key in self.ai_model:
                             if key != "learning_rate":
                                 self.ai_model[key] = (self.ai_model[key] + agent.ai_model[key]) / 2
@@ -765,7 +763,7 @@ class Agent:
             'priority': priority,
             'status': 'Queued'
         })
-        # Sort tasks by priority
+        
         self.task_queue.sort(key=lambda x: x['priority'], reverse=True)
     
     def process_tasks(self):
@@ -785,7 +783,7 @@ class Agent:
         else:
             self.update_sensors(environment)
             
-            # Select appropriate algorithm based on agent type
+           
             if self.type == "Swarm Intelligence":
                 self.swarm_intelligence_navigation(environment, agents)
             else:
@@ -795,7 +793,7 @@ class Agent:
             self.update_communication(agents)
             self.process_tasks()
         
-        # Record performance
+        
         if len(self.performance_history) < 100:
             efficiency = self.total_distance / (self.completed_paths + 1) if self.completed_paths > 0 else 0
             self.performance_history.append({
@@ -808,62 +806,62 @@ class Agent:
             })
     
     def draw(self, screen):
-        # Draw sensors
+        
         for sensor in self.sensors:
             pygame.draw.line(screen, SENSOR_COLOR, (sensor[0], sensor[1]), (sensor[2], sensor[3]), 2)
         
-        # Draw path
+        
         for i in range(1, len(self.path)):
             pygame.draw.line(screen, self.path_color, self.path[i-1], self.path[i], 3)
         
-        # Draw path points
+       
         for point in self.path:
             pygame.draw.circle(screen, self.path_color, (int(point[0]), int(point[1])), 5)
         
-        # Draw collision points
+        
         for point in self.collision_points:
             pygame.draw.circle(screen, (231, 76, 60), (int(point[0]), int(point[1])), 4)
         
-        # Draw clusters
+        
         for cluster in self.clusters:
             if len(cluster) > 0:
                 center = np.mean(cluster, axis=0)
                 pygame.draw.circle(screen, (155, 89, 182), (int(center[0]), int(center[1])), 8, 2)
         
-        # Draw memory trail
+        
         for i in range(1, len(self.memory)):
             alpha = int(255 * i / len(self.memory))
             color = (self.color[0], self.color[1], self.color[2], alpha)
             pygame.draw.line(screen, color, self.memory[i-1], self.memory[i], 2)
         
-        # Draw communication range
+        
         pygame.draw.circle(screen, (200, 200, 200, 50), (int(self.x), int(self.y)), self.communication_range, 1)
         
-        # Draw communication links
+       
         for partner in self.communication_partners:
             pygame.draw.line(screen, (0, 255, 0, 100), (self.x, self.y), (partner.x, partner.y), 2)
         
-        # Draw agent
+       
         pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
         pygame.draw.circle(screen, AGENT_OUTLINE, (int(self.x), int(self.y)), self.radius, 3)
         
-        # Draw direction indicator
+      
         end_x = self.x + math.cos(self.direction) * self.radius
         end_y = self.y + math.sin(self.direction) * self.radius
         pygame.draw.line(screen, AGENT_OUTLINE, (self.x, self.y), (end_x, end_y), 3)
         
-        # Draw agent type label
+       
         label = small_font.render(self.type, True, TEXT_COLOR)
         screen.blit(label, (self.x - label.get_width()//2, self.y + self.radius + 5))
         
-        # Draw battery indicator
+        
         battery_width = 30
         battery_height = 10
         pygame.draw.rect(screen, (200, 200, 200), (self.x - battery_width//2, self.y - 30, battery_width, battery_height), 1)
         battery_color = SUCCESS_COLOR if self.battery > 30 else WARNING_COLOR if self.battery > 10 else ERROR_COLOR
         pygame.draw.rect(screen, battery_color, (self.x - battery_width//2, self.y - 30, int(battery_width * self.battery/100), battery_height))
         
-        # Draw emergency mode indicator
+      
         if self.emergency_mode:
             pygame.draw.circle(screen, ERROR_COLOR, (int(self.x), int(self.y - 45)), 5)
 
@@ -915,13 +913,13 @@ class Slider:
         self.handle_rect.centerx = self.rect.left + normalized * self.rect.width
         
     def draw(self, screen):
-        # Draw slider track
+        
         pygame.draw.rect(screen, SLIDER_COLOR, self.rect, border_radius=3)
         
         # Draw handle
         pygame.draw.rect(screen, SLIDER_HANDLE_COLOR, self.handle_rect, border_radius=5)
         
-        # Draw label and value
+        
         label_text = small_font.render(f"{self.label}: {self.value:.1f}", True, TEXT_COLOR)
         screen.blit(label_text, (self.rect.x, self.rect.y - 20))
         
@@ -948,7 +946,7 @@ class Menu:
         self.selected = "Home"
         self.rects = []
         
-        # Calculate button positions
+     
         width = 150
         spacing = 10
         total_width = len(self.options) * width + (len(self.options) - 1) * spacing
@@ -958,10 +956,10 @@ class Menu:
             self.rects.append(pygame.Rect(start_x + i*(width + spacing), 10, width, 40))
     
     def draw(self, screen):
-        # Draw menu background
+        
         pygame.draw.rect(screen, MENU_COLOR, (0, 0, WIDTH, 60))
         
-        # Draw menu options
+       
         for i, option in enumerate(self.options):
             color = MENU_HIGHLIGHT if option == self.selected else (100, 100, 120)
             pygame.draw.rect(screen, color, self.rects[i], border_radius=5)
@@ -1001,7 +999,7 @@ class MissionPlanner:
             'end_time': None
         }
         self.missions.append(mission)
-        # Sort missions by priority
+       
         self.missions.sort(key=lambda x: x['priority'], reverse=True)
         self.log_event(f"New mission created: {name}")
     
@@ -1014,7 +1012,7 @@ class MissionPlanner:
     
     def update_mission(self, agents):
         if self.current_mission and self.current_mission['status'] == 'In Progress':
-            # Calculate progress based on agent objectives
+           
             completed = 0
             for objective in self.current_mission['objectives']:
                 if objective['status'] == 'Completed':
@@ -1033,13 +1031,13 @@ class MissionPlanner:
         if self.current_mission:
             for objective in self.current_mission['objectives']:
                 if objective['status'] == 'Pending':
-                    # Find the best agent for this objective based on skills and proximity
+                   
                     best_agent = None
                     best_score = -1
                     
                     for agent in agents:
                         if agent.status != "Battery Dead" and not agent.charging:
-                            # Score based on distance, battery, and skills
+                           
                             dist = math.sqrt((agent.x - objective['x'])**2 + (agent.y - objective['y'])**2)
                             skill_match = agent.skill_set.get(objective.get('required_skill', 'navigation'), 0.5)
                             score = (100 - dist/10) + agent.battery/2 + skill_match * 50
@@ -1065,12 +1063,12 @@ class AITrainingCenter:
         self.research_points = 0
     
     def update(self, agents):
-        # Generate research points based on agent performance
+        
         for agent in agents:
             self.research_points += agent.data_collected * 0.1
-            agent.data_collected = 0  # Convert data to research points
+            agent.data_collected = 0  
         
-        # Update training progress
+       
         for program in self.training_programs.values():
             if program["progress"] > 0:
                 program["progress"] -= 1
@@ -1081,27 +1079,27 @@ class AITrainingCenter:
         program = self.training_programs.get(program_name)
         if program and self.research_points >= program["cost"]:
             self.research_points -= program["cost"]
-            program["progress"] = 100  # 100 updates to complete training
+            program["progress"] = 100  
             return True
         return False
 
 def draw_homepage(screen):
-    # Draw background with gradient
+    
     for y in range(HEIGHT):
         color_value = 30 + (y / HEIGHT) * 20
         pygame.draw.line(screen, (color_value, color_value + 10, color_value + 20), (0, y), (WIDTH, y))
     
-    # Draw title with shadow
+  
     title = large_font.render("Ultra-Advanced AI Indoor Obstacle Avoidance System", True, (255, 255, 255))
     shadow = large_font.render("Ultra-Advanced AI Indoor Obstacle Avoidance System", True, (20, 20, 20))
     screen.blit(shadow, (WIDTH//2 - title.get_width()//2 + 2, 102))
     screen.blit(title, (WIDTH//2 - title.get_width()//2, 100))
     
-    # Draw subtitle
+   
     subtitle = title_font.render("Next-Generation Autonomous Navigation with Machine Learning", True, (200, 200, 200))
     screen.blit(subtitle, (WIDTH//2 - subtitle.get_width()//2, 160))
     
-    # Draw feature boxes with icons
+    
     features = [
         ("Multi-Algorithm Navigation", "Compare different AI approaches for path planning", "🧠", AGENT_COLORS[0]),
         ("Real-time Obstacle Avoidance", "Dynamic response to moving obstacles", "⚠️", AGENT_COLORS[1]),
@@ -1117,7 +1115,7 @@ def draw_homepage(screen):
         x = 150 + col * 400
         y = 220 + row * 180
         
-        # Draw feature box
+        
         pygame.draw.rect(screen, (50, 60, 70, 200), (x, y, 350, 150), border_radius=10)
         pygame.draw.rect(screen, color, (x, y, 350, 150), 3, border_radius=10)
         
@@ -1125,37 +1123,37 @@ def draw_homepage(screen):
         icon_text = title_font.render(icon, True, (255, 255, 255))
         screen.blit(icon_text, (x + 25, y + 20))
         
-        # Draw feature title
+        
         title_text = font.render(title, True, (255, 255, 255))
         screen.blit(title_text, (x + 60, y + 25))
         
-        # Draw feature description
+       
         desc_text = small_font.render(desc, True, (180, 180, 180))
         screen.blit(desc_text, (x + 20, y + 70))
     
-    # Draw start button with animation
+    
     button_color = (41, 128, 185) if (time.time() % 1) > 0.5 else (52, 152, 219)
     pygame.draw.rect(screen, button_color, (WIDTH//2 - 100, 600, 200, 60), border_radius=10)
     pygame.draw.rect(screen, (30, 30, 30), (WIDTH//2 - 100, 600, 200, 60), 3, border_radius=10)
     start_text = title_font.render("Start Simulation", True, (255, 255, 255))
     screen.blit(start_text, (WIDTH//2 - start_text.get_width()//2, 610))
     
-    # Draw footer
+   
     footer = small_font.render("SLASH MARK IT Solutions | Advanced AI Robotics Division", True, (150, 150, 150))
     screen.blit(footer, (WIDTH//2 - footer.get_width()//2, HEIGHT - 30))
     
-    # Draw version info
+    
     version = small_font.render("v3.0.0 | © 2023 SLASH MARK IT Solutions", True, (120, 120, 120))
     screen.blit(version, (WIDTH - version.get_width() - 20, HEIGHT - 30))
 
 def draw_analysis_screen(screen, agents, environment, mission_planner):
     screen.fill((40, 44, 52))
     
-    # Draw title
+   
     title = title_font.render("Advanced Performance Analytics Dashboard", True, (255, 255, 255))
     screen.blit(title, (WIDTH//2 - title.get_width()//2, 20))
     
-    # Draw agent performance panels
+    
     panel_width = (WIDTH - 60) // 2
     panel_height = (HEIGHT - 100) // 3
     
@@ -1165,15 +1163,15 @@ def draw_analysis_screen(screen, agents, environment, mission_planner):
         x = 20 + col * (panel_width + 20)
         y = 70 + row * (panel_height + 20)
         
-        # Draw panel
+        
         pygame.draw.rect(screen, (50, 54, 62), (x, y, panel_width, panel_height), border_radius=10)
         pygame.draw.rect(screen, agent.color, (x, y, panel_width, panel_height), 2, border_radius=10)
         
-        # Draw agent title
+        
         title_text = font.render(f"{agent.type} Performance", True, (255, 255, 255))
         screen.blit(title_text, (x + 20, y + 15))
         
-        # Draw performance metrics
+        
         metrics = [
             f"Paths: {agent.completed_paths} | Dist: {agent.total_distance:.1f}",
             f"Efficiency: {agent.total_distance/(agent.completed_paths+1):.1f}",
@@ -1187,14 +1185,13 @@ def draw_analysis_screen(screen, agents, environment, mission_planner):
             metric_text = small_font.render(metric, True, (200, 200, 200))
             screen.blit(metric_text, (x + 20, y + 40 + j * 20))
         
-        # Draw mini performance chart
+        
         if len(agent.performance_history) > 1:
             chart_width = panel_width - 40
             chart_height = 40
             chart_x = x + 20
             chart_y = y + panel_height - chart_height - 10
             
-            # Draw chart background
             pygame.draw.rect(screen, (40, 40, 40), (chart_x, chart_y, chart_width, chart_height))
             
             # Draw chart data
@@ -1208,7 +1205,7 @@ def draw_analysis_screen(screen, agents, environment, mission_planner):
                         y2 = chart_y + chart_height - (agent.performance_history[j]['efficiency'] / max_efficiency) * chart_height
                         pygame.draw.line(screen, agent.color, (x1, y1), (x2, y2), 2)
     
-    # Draw environment stats
+    
     env_x = 20
     env_y = 70 + 3 * (panel_height + 20)
     pygame.draw.rect(screen, (50, 54, 62), (env_x, env_y, WIDTH - 40, 100), border_radius=10)
@@ -1229,7 +1226,7 @@ def draw_analysis_screen(screen, agents, environment, mission_planner):
         stat_text = small_font.render(stat, True, (200, 200, 200))
         screen.blit(stat_text, (env_x + 20 + i * 300, env_y + 50))
     
-    # Draw mission log
+   
     log_x = 20
     log_y = env_y + 120
     pygame.draw.rect(screen, (50, 54, 62), (log_x, log_y, WIDTH - 40, 120), border_radius=10)
@@ -1245,15 +1242,15 @@ def draw_analysis_screen(screen, agents, environment, mission_planner):
 def draw_ai_models_screen(screen, agents, ai_training):
     screen.fill((40, 44, 52))
     
-    # Draw title
+    
     title = title_font.render("AI Model Training Center", True, (255, 255, 255))
     screen.blit(title, (WIDTH//2 - title.get_width()//2, 20))
     
-    # Draw research points
+    
     research_text = title_font.render(f"Research Points: {ai_training.research_points:.1f}", True, (241, 196, 15))
     screen.blit(research_text, (WIDTH - 250, 20))
     
-    # Draw AI training programs
+   
     program_width = (WIDTH - 60) // 2
     program_height = (HEIGHT - 100) // 4
     
@@ -1264,36 +1261,36 @@ def draw_ai_models_screen(screen, agents, ai_training):
         x = 20 + col * (program_width + 20)
         y = 70 + row * (program_height + 20)
         
-        # Draw program panel
+       
         pygame.draw.rect(screen, (50, 54, 62), (x, y, program_width, program_height), border_radius=10)
         pygame.draw.rect(screen, AGENT_COLORS[i], (x, y, program_width, program_height), 2, border_radius=10)
         
-        # Draw program title
+        
         title_text = font.render(program_name, True, (255, 255, 255))
         screen.blit(title_text, (x + 20, y + 15))
         
-        # Draw program level
+        
         level_text = small_font.render(f"Level: {program_data['level']:.2f}", True, (200, 200, 200))
         screen.blit(level_text, (x + 20, y + 40))
         
-        # Draw program cost
+       
         cost_text = small_font.render(f"Cost: {program_data['cost']} research points", True, (200, 200, 200))
         screen.blit(cost_text, (x + 20, y + 60))
         
-        # Draw progress bar
+        
         if program_data['progress'] > 0:
             pygame.draw.rect(screen, (40, 40, 40), (x + 20, y + 80, program_width - 40, 15))
             pygame.draw.rect(screen, SUCCESS_COLOR, (x + 20, y + 80, (program_width - 40) * program_data['progress'] / 100, 15))
             progress_text = small_font.render(f"Training: {program_data['progress']}%", True, (255, 255, 255))
             screen.blit(progress_text, (x + 20, y + 100))
         else:
-            # Draw train button
+           
             button_color = BUTTON_HOVER_COLOR if ai_training.research_points >= program_data['cost'] else ERROR_COLOR
             pygame.draw.rect(screen, button_color, (x + 20, y + 80, 100, 30), border_radius=5)
             train_text = small_font.render("Train", True, (255, 255, 255))
             screen.blit(train_text, (x + 70 - train_text.get_width()//2, y + 95 - train_text.get_height()//2))
     
-    # Draw AI model benefits
+   
     benefits_x = 20
     benefits_y = 70 + 2 * (program_height + 20)
     pygame.draw.rect(screen, (50, 54, 62), (benefits_x, benefits_y, WIDTH - 40, 150), border_radius=10)
@@ -1313,7 +1310,7 @@ def draw_ai_models_screen(screen, agents, ai_training):
         benefit_text = small_font.render(benefit, True, (200, 200, 200))
         screen.blit(benefit_text, (benefits_x + 20, benefits_y + 45 + i * 25))
 
-# Create environment and agents
+
 environment = IndoorEnvironment(WIDTH, HEIGHT, "Office")
 agents = [
     Agent(200, 200, AGENT_COLORS[0], PATH_COLORS[0], "Basic AI"),
@@ -1324,7 +1321,7 @@ agents = [
     Agent(200, 700, AGENT_COLORS[5], PATH_COLORS[5], "Swarm Intelligence")
 ]
 
-# Set different speeds for different agents
+
 agents[0].speed = 2.0
 agents[1].speed = 2.5
 agents[2].speed = 3.0
@@ -1332,13 +1329,13 @@ agents[3].speed = 3.5
 agents[4].speed = 3.2
 agents[5].speed = 2.8
 
-# Create mission planner
+
 mission_planner = MissionPlanner()
 
-# Create AI training center
+
 ai_training = AITrainingCenter()
 
-# Create UI buttons
+
 buttons = [
     Button(50, 100, 160, 40, "Set Target All"),
     Button(50, 150, 160, 40, "Add Obstacle"),
@@ -1351,7 +1348,7 @@ buttons = [
     Button(50, 500, 160, 40, "Train AI")
 ]
 
-# Create sliders for agent parameters
+
 sliders = [
     Slider(50, 560, 160, 15, 1.0, 5.0, 2.0, "Agent 1 Speed"),
     Slider(50, 590, 160, 15, 1.0, 5.0, 2.5, "Agent 2 Speed"),
@@ -1361,19 +1358,19 @@ sliders = [
     Slider(50, 710, 160, 15, 1.0, 5.0, 2.8, "Agent 6 Speed")
 ]
 
-# Create menu
+
 menu = Menu()
 
-# Main game loop
+
 clock = pygame.time.Clock()
 running = True
 target_mode = False
 show_heatmap = False
 selected_agent = None
 last_update_time = time.time()
-update_interval = 0.5  # Update stats every 0.5 seconds
+update_interval = 0.5 s
 paused = False
-current_screen = "Home"  # Can be "Home", "Simulation", "Analysis", "AI Models", "Settings", "Help"
+current_screen = "Home"  
 env_types = list(ENVIRONMENT_TEMPLATES.keys())
 current_env_index = 0
 
@@ -1385,19 +1382,19 @@ while running:
         if event.type == pygame.QUIT:
             running = False
             
-        # Handle menu clicks
+        
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             clicked_option = menu.check_click(mouse_pos)
             if clicked_option:
                 current_screen = clicked_option
                 
-        # Handle button clicks
+      s
         for button in buttons:
             if button.check_click(mouse_pos, event):
                 if button.text == "Set Target All":
                     target_mode = True
                 elif button.text == "Add Obstacle":
-                    # Add a new obstacle at a random position
+                   
                     x = random.randint(120, 1160)
                     y = random.randint(120, 760)
                     size = random.randint(20, 50)
@@ -1424,7 +1421,7 @@ while running:
                 elif button.text == "Pause/Resume":
                     paused = not paused
                 elif button.text == "New Mission":
-                    # Create a new random mission
+                    
                     objectives = []
                     for _ in range(random.randint(3, 6)):
                         objectives.append({
@@ -1443,7 +1440,7 @@ while running:
                         agent.path = []
                         agent.memory = []
                 elif button.text == "Train AI" and current_screen == "AI Models":
-                    # Check if clicked on a training program
+                    
                     program_width = (WIDTH - 60) // 2
                     program_height = (HEIGHT - 100) // 4
                     
@@ -1458,11 +1455,11 @@ while running:
                             if ai_training.start_training(program_name):
                                 mission_planner.log_event(f"Started training: {program_name}")
                     
-        # Handle slider interactions
+        
         for slider in sliders:
             slider.check_click(mouse_pos, event)
             
-        # Set target on mouse click
+        
         if event.type == pygame.MOUSEBUTTONDOWN and target_mode and current_screen == "Simulation":
             x, y = mouse_pos
             if 100 < x < 1180 and 100 < y < 780:  # Within indoor area
@@ -1470,23 +1467,23 @@ while running:
                     agent.plan_path(x, y, environment)
             target_mode = False
             
-        # Handle homepage start button
+        
         if current_screen == "Home" and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if WIDTH//2 - 100 <= mouse_pos[0] <= WIDTH//2 + 100 and 600 <= mouse_pos[1] <= 660:
                 current_screen = "Simulation"
             
-        # Update slider values if dragging
+        
         for i, slider in enumerate(sliders):
             if slider.dragging:
                 slider.update(mouse_pos)
                 agents[i].speed = slider.value
     
-    # Update sliders
+    
     for slider in sliders:
         if slider.dragging:
             slider.update(mouse_pos)
     
-    # Draw the appropriate screen
+    
     if current_screen == "Home":
         draw_homepage(screen)
     elif current_screen == "Analysis":
@@ -1494,38 +1491,38 @@ while running:
     elif current_screen == "AI Models":
         draw_ai_models_screen(screen, agents, ai_training)
     else:
-        # Draw simulation environment
+        
         screen.fill(BACKGROUND)
         
-        # Draw heatmap if enabled
+        
         if show_heatmap:
             environment.draw_heatmap(screen)
         
-        # Draw title and info
+       
         title_text = title_font.render("Ultra-Advanced AI Indoor Obstacle Avoidance System", True, TEXT_COLOR)
         screen.blit(title_text, (WIDTH//2 - title_text.get_width()//2, 70))
         
-        # Draw environment and agents
+       
         environment.draw(screen)
         
-        # Update environment and agents if not paused
+       
         if not paused:
             environment.update_dynamic_obstacles()
             environment.update_mission_time()
             for agent in agents:
                 agent.update(environment, agents)
             
-            # Update missions
+           
             mission_planner.update_mission(agents)
             if mission_planner.current_mission:
                 mission_planner.assign_objectives(agents)
             elif mission_planner.missions and not mission_planner.current_mission:
                 mission_planner.start_mission(0)
             
-            # Update AI training
+            
             ai_training.update(agents)
             
-            # Apply AI training benefits to agents
+            
             for agent in agents:
                 for program_name, program_data in ai_training.training_programs.items():
                     if program_name == "Obstacle Prediction":
@@ -1547,20 +1544,20 @@ while running:
         for agent in agents:
             agent.draw(screen)
         
-        # Draw UI panel
+        
         pygame.draw.rect(screen, PANEL_COLOR, (10, 80, 240, 700), border_radius=10)
         pygame.draw.rect(screen, (180, 180, 190), (10, 80, 240, 700), 3, border_radius=10)
         
-        # Draw buttons
+        
         for button in buttons:
             button.check_hover(mouse_pos)
             button.draw(screen)
         
-        # Draw sliders
+        
         for slider in sliders:
             slider.draw(screen)
         
-        # Draw mission info
+        
         mission_y = 750
         mission_text = font.render("Missions:", True, TEXT_COLOR)
         screen.blit(mission_text, (20, mission_y))
@@ -1571,18 +1568,18 @@ while running:
             mission_name = small_font.render(f"{mission['name']}: {mission['progress']:.1f}%", True, TEXT_COLOR)
             screen.blit(mission_name, (30, mission_y))
         
-        # Draw environment info
+       
         env_text = small_font.render(f"Environment: {environment.env_type}", True, TEXT_COLOR)
         screen.blit(env_text, (20, 820))
         
         time_text = small_font.render(f"Mission Time: {environment.mission_time:.1f}s", True, TEXT_COLOR)
         screen.blit(time_text, (20, 840))
         
-        # Draw research points
+        
         research_text = small_font.render(f"Research: {ai_training.research_points:.1f}", True, TEXT_COLOR)
         screen.blit(research_text, (20, 860))
         
-        # Draw help text
+
         help_text = small_font.render("Click 'Set Target All' then click anywhere to set navigation target", True, TEXT_COLOR)
         screen.blit(help_text, (WIDTH//2 - help_text.get_width()//2, HEIGHT - 30))
         
@@ -1598,12 +1595,13 @@ while running:
             pause_text = large_font.render("PAUSED", True, (231, 76, 60))
             screen.blit(pause_text, (WIDTH//2 - pause_text.get_width()//2, HEIGHT//2 - 50))
     
-    # Draw menu
+   
     menu.draw(screen)
     
-    # Update display
+    
     pygame.display.flip()
     clock.tick(60)
 
 pygame.quit()
+
 sys.exit()
